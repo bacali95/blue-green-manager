@@ -17,7 +17,10 @@
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@commons/shared": ["./libs/commons/src/shared/index.ts"],
+      "@commons/server": ["./libs/commons/src/server/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

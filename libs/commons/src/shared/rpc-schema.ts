@@ -22,7 +22,17 @@ export type RpcSchema = {
       registrationToken: string;
       hostname: string;
       publicKey: string;
-    }) => Promise<{ agentId: string }>;
+    }) => Promise<{
+      agentId: string;
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: string;
+    }>;
+    refresh: (params: { refreshToken: string }) => Promise<{
+      accessToken: string;
+      refreshToken: string;
+      expiresIn: string;
+    }>;
   };
   registrationToken: {
     create: (params: { hostname: string; validForMinutes: number }) => Promise<RegistrationToken>;
