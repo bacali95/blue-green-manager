@@ -98,7 +98,7 @@ export const agentHandlers: RpcSchema['agent'] = {
 
     await prisma.commandExecutionLog.update({
       where: { id: command.id },
-      data: { status: CommandStatus.RUNNING, executedAt: new Date() },
+      data: { status: CommandStatus.SENT, executedAt: new Date() },
     });
 
     return {

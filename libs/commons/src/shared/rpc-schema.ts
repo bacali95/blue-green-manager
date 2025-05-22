@@ -1,5 +1,5 @@
-import type { RegistrationToken } from '@prisma/client';
-import type { JsonValue } from '@prisma/client/runtime/library';
+import type { CommandStatus, Prisma, RegistrationToken } from '@prisma/client';
+import type { InputJsonValue, JsonValue } from '@prisma/client/runtime/library';
 
 export type IRpcSchema = {
   [entity: string]: {
@@ -44,6 +44,19 @@ export type RpcSchema = {
       deploymentId: string | null;
       metadata: JsonValue;
     }>;
+  };
+  command: {
+    submitResult: (
+      params: {
+        commandId: string;
+        status: CommandStatus;
+        stdoutEnc: string;
+        stderrEnc: string;
+        durationMs: number;
+        metadata: Prisma.NullableJsonNullValueInput | InputJsonValue;
+      },
+      request: Request,
+    ) => Promise<void>;
   };
   registrationToken: {
     create: (params: { hostname: string; validForMinutes: number }) => Promise<RegistrationToken>;

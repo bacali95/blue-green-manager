@@ -71,15 +71,15 @@ model CommandExecutionLog {
   application   Application   @relation(fields: [applicationId], references: [id])
   deploymentId  String?
   deployment    Deployment?   @relation(fields: [deploymentId], references: [id])
-  command       String // e.g. "deploy", "rollback"
-  status        CommandStatus @default(QUEUED) // QUEUED, SENT, SUCCESS, FAILED, etc.
-  stdoutEnc     String? // encrypted stdout (base64)
-  stderrEnc     String? // encrypted stderr (base64)
+  command       String
+  status        CommandStatus @default(QUEUED)
+  stdoutEnc     String?
+  stderrEnc     String?
   durationMs    Int?
   metadata      Json?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
-  executedAt    DateTime? // time command was delivered to agent
+  executedAt    DateTime?
 }
 
 model RegistrationToken {
@@ -122,6 +122,7 @@ enum AgentStatus {
 
 enum CommandStatus {
   QUEUED
+  SENT
   RUNNING
   SUCCESS
   FAILED
