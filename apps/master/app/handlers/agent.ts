@@ -1,9 +1,10 @@
-import { AgentStatus } from '@prisma/client';
+import { AgentStatus, CommandStatus } from '@prisma/client';
 
 import { RpcSchema } from '@commons/shared';
 
 import { prisma } from '../services';
 import {
+  assertAgentAuthorized,
   generateAccessToken,
   generateRefreshToken,
   getRefreshTokenExpiry,
@@ -83,6 +84,29 @@ export const agentHandlers: RpcSchema['agent'] = {
       accessToken,
       refreshToken: newToken,
       expiresIn: process.env.ACCESS_TOKEN_EXPIRY ?? '15m',
+    };
+  },
+  poll: async ({ agentId }, request) => {
+    await assertAgentAuthorized(request, agentId);
+
+    const command = await prisma.commandExecutionLog.findFirst({
+      where: { agentId, status: CommandStatus.QUEUED },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    if (!command) throw new Response('Queue is empty!', { status: 204 });
+
+    await prisma.commandExecutionLog.update({
+      where: { id: command.id },
+      data: { status: CommandStatus.RUNNING, executedAt: new Date() },
+    });
+
+    return {
+      commandId: command.id,
+      command: command.command,
+      applicationId: command.applicationId,
+      deploymentId: command.deploymentId,
+      metadata: command.metadata,
     };
   },
 };

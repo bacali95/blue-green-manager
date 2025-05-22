@@ -72,13 +72,14 @@ model CommandExecutionLog {
   deploymentId  String?
   deployment    Deployment?   @relation(fields: [deploymentId], references: [id])
   command       String // e.g. "deploy", "rollback"
-  status        CommandStatus
+  status        CommandStatus @default(QUEUED) // QUEUED, SENT, SUCCESS, FAILED, etc.
   stdoutEnc     String? // encrypted stdout (base64)
   stderrEnc     String? // encrypted stderr (base64)
-  executedAt    DateTime      @default(now())
   durationMs    Int?
   metadata      Json?
   createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  executedAt    DateTime? // time command was delivered to agent
 }
 
 model RegistrationToken {

@@ -2,6 +2,8 @@ import { randomBytes } from 'crypto';
 import jwt from 'jsonwebtoken';
 import ms, { StringValue } from 'ms';
 
+import type { JwtPayload } from '../types';
+
 const JWT_SECRET = process.env.JWT_SECRET ?? '';
 const ACCESS_EXPIRES_IN = (process.env.ACCESS_TOKEN_EXPIRY ?? '15m') as StringValue;
 const REFRESH_EXPIRES_IN = (process.env.REFRESH_TOKEN_EXPIRY ?? '7d') as StringValue;
@@ -12,8 +14,8 @@ export function generateAccessToken(agentId: string): string {
   });
 }
 
-export function verifyAccessToken(token: string) {
-  return jwt.verify(token, JWT_SECRET) as { sub: string; type: string };
+export function verifyAccessToken(token: string): JwtPayload {
+  return jwt.verify(token, JWT_SECRET) as JwtPayload;
 }
 
 export function generateRefreshToken(): string {

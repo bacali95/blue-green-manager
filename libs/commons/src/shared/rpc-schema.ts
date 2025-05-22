@@ -1,8 +1,9 @@
 import type { RegistrationToken } from '@prisma/client';
+import type { JsonValue } from '@prisma/client/runtime/library';
 
 export type IRpcSchema = {
   [entity: string]: {
-    [operation: string]: (params: any) => Promise<any>;
+    [operation: string]: (params: any, request: Request) => Promise<any>;
   };
 };
 
@@ -32,6 +33,16 @@ export type RpcSchema = {
       accessToken: string;
       refreshToken: string;
       expiresIn: string;
+    }>;
+    poll: (
+      params: { agentId: string },
+      request: Request,
+    ) => Promise<{
+      commandId: string;
+      command: string;
+      applicationId: string;
+      deploymentId: string | null;
+      metadata: JsonValue;
     }>;
   };
   registrationToken: {

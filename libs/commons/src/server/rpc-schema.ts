@@ -8,7 +8,7 @@ export async function createRpcHandler<T extends RpcSchema>(request: Request, op
   try {
     const { entity, operation, params } = await request.json();
 
-    return await (operations as any)[entity][operation](params);
+    return await (operations as any)[entity][operation](params, request);
   } catch (error: any) {
     throw handleError(error);
   }
