@@ -1,22 +1,16 @@
 import {
   Links,
+  type LinksFunction,
   Meta,
+  type MetaFunction,
   Outlet,
   Scripts,
   ScrollRestoration,
-  type MetaFunction,
-  type LinksFunction,
 } from 'react-router';
 
 import { AppNav } from './app-nav';
 
-export const meta: MetaFunction = () => [
-  {  title: 'BlueGreen Manager'
-
-
-
-  },
-];
+export const meta: MetaFunction = () => [{ title: 'BlueGreen Manager' }];
 
 export const links: LinksFunction = () => [
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
