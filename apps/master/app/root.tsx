@@ -11,8 +11,10 @@ import {
 import { AppNav } from './app-nav';
 
 export const meta: MetaFunction = () => [
-  {
-    title: 'New Nx React Router App',
+  {  title: 'BlueGreen Manager'
+
+
+
   },
 ];
 

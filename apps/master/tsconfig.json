@@ -2,14 +2,20 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "allowJs": false,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "types": ["vite/client", "vitest", "@react-router/node"],
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "rootDirs": [".", "./.react-router/types"],
+    "baseUrl": ".",
+    "paths": {
+      "@commons/shared": ["../../libs/commons/src/shared/index.ts"],
+      "@commons/server": ["../../libs/commons/src/server/index.ts"]
+    }
   },
   "files": [],
-  "include": [],
+  "include": [".react-router/types/**/*"],
   "references": [
     {
       "path": "./tsconfig.app.json"
