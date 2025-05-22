@@ -1,0 +1,24 @@
+services:
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_DB: blue-green-manager
+      POSTGRES_USER: blue-green-manager
+      POSTGRES_PASSWORD: blue-green-manager
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  adminer:
+    image: adminer
+    restart: always
+    environment:
+      ADMINER_DESIGN: lucas-sandery
+    ports:
+      - '8080:8080'
+
+volumes:
+  db-data:
+    driver: local

@@ -4,11 +4,16 @@
   "license": "MIT",
   "private": true,
   "packageManager": "yarn@4.9.1",
+  "scripts": {
+    "compose:dev": "docker compose -f docker-compose.dev.yaml"
+  },
   "dependencies": {
+    "@prisma/client": "^6.8.2",
     "@react-router/node": "^7.2.0",
     "@react-router/serve": "^7.2.0",
     "express": "^4.21.2",
     "isbot": "^4.4.0",
+    "prisma": "^6.8.2",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-router": "^7.2.0"

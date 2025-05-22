@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../apps/master/app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Application {
+  id                  String                @id @default(cuid())
+  name                String                @unique
+  description         String?
+  deployments         Deployment[]
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  HealthCheck         HealthCheck[]
+  CommandExecutionLog CommandExecutionLog[]
+}
+
+model Deployment {
+  id                  String                @id @default(cuid())
+  version             String
+  color               DeploymentColor
+  status              DeploymentStatus
+  applicationId       String
+  application         Application           @relation(fields: [applicationId], references: [id])
+  agentId             String?
+  agent               Agent?                @relation(fields: [agentId], references: [id])
+  deployedAt          DateTime?
+  rolledBackAt        DateTime?
+  metadata            Json?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  CommandExecutionLog CommandExecutionLog[]
+}
+
+model Agent {
+  id                  String                @id @default(cuid())
+  hostname            String
+  ip                  String
+  status              AgentStatus
+  version             String?
+  lastSeenAt          DateTime?
+  deployments         Deployment[]
+  healthChecks        HealthCheck[]
+  publicKey           String // base64 encoded public key
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  CommandExecutionLog CommandExecutionLog[]
+}
+
+model HealthCheck {
+  id            String      @id @default(cuid())
+  agentId       String
+  agent         Agent       @relation(fields: [agentId], references: [id])
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
+  success       Boolean
+  checkedAt     DateTime    @default(now())
+  message       String?
+  metadata      Json?
+}
+
+model CommandExecutionLog {
+  id            String        @id @default(cuid())
+  agentId       String
+  agent         Agent         @relation(fields: [agentId], references: [id])
+  applicationId String
+  application   Application   @relation(fields: [applicationId], references: [id])
+  deploymentId  String?
+  deployment    Deployment?   @relation(fields: [deploymentId], references: [id])
+  command       String // e.g. "deploy", "rollback"
+  status        CommandStatus
+  stdoutEnc     String? // encrypted stdout (base64)
+  stderrEnc     String? // encrypted stderr (base64)
+  executedAt    DateTime      @default(now())
+  durationMs    Int?
+  metadata      Json?
+  createdAt     DateTime      @default(now())
+}
+
+model RegistrationToken {
+  id         String   @id @default(cuid())
+  token      String   @unique
+  hostname   String?
+  validUntil DateTime
+  used       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+}
+
+enum DeploymentColor {
+  BLUE
+  GREEN
+}
+
+enum DeploymentStatus {
+  PENDING
+  ACTIVE
+  FAILED
+  ROLLED_BACK
+  STOPPED
+}
+
+enum AgentStatus {
+  ONLINE
+  OFFLINE
+  DEGRADED
+  MAINTENANCE
+}
+
+enum CommandStatus {
+  QUEUED
+  RUNNING
+  SUCCESS
+  FAILED
+  TIMEOUT
+}
