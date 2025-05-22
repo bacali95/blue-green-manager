@@ -1,0 +1,10 @@
+{
+  "name": "master-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/master-e2e/src",
+  "tags": [],
+  "implicitDependencies": ["master"],
+  "// targets": "to see all targets run: nx show project master-e2e --web",
+  "targets": {}
+}
