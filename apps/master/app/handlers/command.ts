@@ -1,13 +1,12 @@
+import { decryptWithPrivateKey } from '@commons/server';
 import { RpcSchema } from '@commons/shared';
 
-import { prisma } from '../services';
-import { assertAgentAuthorized } from '../utils';
+import { config } from '~/config';
+import { prisma } from '~/services';
+import { assertAgentAuthorized } from '~/utils';
 
 export const commandHandlers: RpcSchema['command'] = {
-  submitResult: async (
-    { commandId, status, stdoutEnc, stderrEnc, durationMs, metadata },
-    request,
-  ) => {
+  submitResult: async ({ commandId, status, stdoutEnc, stderrEnc, duration }, request) => {
     const existing = await prisma.commandExecutionLog.findUnique({
       where: { id: commandId },
     });
@@ -22,10 +21,9 @@ export const commandHandlers: RpcSchema['command'] = {
       where: { id: commandId },
       data: {
         status,
-        stdoutEnc,
-        stderrEnc,
-        durationMs,
-        metadata,
+        stdout: decryptWithPrivateKey(stdoutEnc, config.keyPair.privateKey),
+        stderr: decryptWithPrivateKey(stderrEnc, config.keyPair.privateKey),
+        duration,
       },
     });
   },

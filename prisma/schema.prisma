@@ -7,102 +7,129 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Agent {
+  id                   String                   @id @default(uuid())
+  ip                   String
+  hostname             String
+  status               AgentStatus
+  version              String?
+  lastSeenAt           DateTime?
+  publicKey            String // base64 encoded public key
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  applications         Application[]
+  healthChecks         HealthCheck[]
+  commandExecutionLogs CommandExecutionLog[]
+  refreshTokens        RefreshToken[]
+  registrationTokens   AgentRegistrationToken[]
+}
+
 model Application {
-  id                  String                @id @default(cuid())
-  name                String                @unique
-  description         String?
-  deployments         Deployment[]
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  HealthCheck         HealthCheck[]
-  CommandExecutionLog CommandExecutionLog[]
+  id           String        @id @default(uuid())
+  name         String        @unique
+  description  String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  agentId      String
+  agent        Agent         @relation(fields: [agentId], references: [id])
+  services     Service[]
+  deployments  Deployment[]
+  healthChecks HealthCheck[]
+}
+
+model Service {
+  id            String      @id @default(uuid())
+  name          String
+  image         String
+  hostname      String
+  restart       String
+  environment   Json?
+  ports         String[]
+  volumes       String[]
+  dependsOn     String[]
+  healthCheck   Json?
+  applicationId String
+  application   Application @relation(fields: [applicationId], references: [id])
 }
 
 model Deployment {
-  id                  String                @id @default(cuid())
-  version             String
-  color               DeploymentColor
-  status              DeploymentStatus
-  applicationId       String
-  application         Application           @relation(fields: [applicationId], references: [id])
-  agentId             String?
-  agent               Agent?                @relation(fields: [agentId], references: [id])
-  deployedAt          DateTime?
-  rolledBackAt        DateTime?
-  metadata            Json?
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  CommandExecutionLog CommandExecutionLog[]
+  id                   String                @id @default(uuid())
+  version              String
+  status               DeploymentStatus
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  deployedAt           DateTime?
+  rolledBackAt         DateTime?
+  variables            Json?
+  applicationId        String
+  application          Application           @relation(fields: [applicationId], references: [id])
+  commandExecutionLogs CommandExecutionLog[]
+  extraFiles           DeploymentExtraFile[]
 }
 
-model Agent {
-  id                  String                @id @default(cuid())
-  hostname            String
-  ip                  String
-  status              AgentStatus
-  version             String?
-  lastSeenAt          DateTime?
-  deployments         Deployment[]
-  healthChecks        HealthCheck[]
-  publicKey           String // base64 encoded public key
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  CommandExecutionLog CommandExecutionLog[]
-  refreshTokens       RefreshToken[]
+model DeploymentExtraFile {
+  deploymentId String
+  deployment   Deployment @relation(fields: [deploymentId], references: [id], onDelete: Cascade, onUpdate: Restrict)
+  fileId       String
+  file         File       @relation(fields: [fileId], references: [id], onUpdate: Restrict)
+
+  @@id([deploymentId, fileId])
+  @@index([deploymentId])
+  @@index([fileId])
 }
 
 model HealthCheck {
-  id            String      @id @default(cuid())
+  id            String      @id @default(uuid())
+  success       Boolean
+  message       String?
+  checkedAt     DateTime    @default(now())
   agentId       String
   agent         Agent       @relation(fields: [agentId], references: [id])
   applicationId String
   application   Application @relation(fields: [applicationId], references: [id])
-  success       Boolean
-  checkedAt     DateTime    @default(now())
-  message       String?
-  metadata      Json?
 }
 
 model CommandExecutionLog {
-  id            String        @id @default(cuid())
-  agentId       String
-  agent         Agent         @relation(fields: [agentId], references: [id])
-  applicationId String
-  application   Application   @relation(fields: [applicationId], references: [id])
-  deploymentId  String?
-  deployment    Deployment?   @relation(fields: [deploymentId], references: [id])
-  command       String
-  status        CommandStatus @default(QUEUED)
-  stdoutEnc     String?
-  stderrEnc     String?
-  durationMs    Int?
-  metadata      Json?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  executedAt    DateTime?
+  id           String        @id @default(uuid())
+  status       CommandStatus @default(QUEUED)
+  stdout       String?
+  stderr       String?
+  duration     Int?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  executedAt   DateTime?
+  agentId      String
+  agent        Agent         @relation(fields: [agentId], references: [id])
+  deploymentId String
+  deployment   Deployment    @relation(fields: [deploymentId], references: [id])
 }
 
-model RegistrationToken {
-  id         String   @id @default(cuid())
-  token      String   @unique
-  hostname   String?
-  validUntil DateTime
-  used       Boolean  @default(false)
-  createdAt  DateTime @default(now())
+model AgentRegistrationToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id])
 }
 
 model RefreshToken {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   token     String   @unique
+  createdAt DateTime @default(now())
+  expiresAt DateTime
   agentId   String
   agent     Agent    @relation(fields: [agentId], references: [id])
-  expiresAt DateTime
-  createdAt DateTime @default(now())
 }
 
-enum DeploymentColor {
-  BLUE
-  GREEN
+model File {
+  id                   String                @id @default(uuid())
+  name                 String
+  content              String
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  deploymentExtraFiles DeploymentExtraFile[]
 }
 
 enum DeploymentStatus {

@@ -1,3 +1,4 @@
 export * from './auth';
+export * from './errors';
 export * from './jwt';
-export * from './registration-token';
+export * from './get-value-from-cookie';

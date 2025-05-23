@@ -8,7 +8,7 @@ import {
   ScrollRestoration,
 } from 'react-router';
 
-import { AppNav } from './app-nav';
+import '../styles.css';
 
 export const meta: MetaFunction = () => [{ title: 'BlueGreen Manager' }];
 
@@ -35,7 +35,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <AppNav />
         {children}
         <ScrollRestoration />
         <Scripts />

@@ -1,1 +1,39 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'tw-react-components/index.css';
+@config './tailwind.config.ts';
+
+@font-face {
+  font-family: 'Inter var';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/Inter-roman.var.woff2?v=3.18') format('woff2');
+  font-named-instance: Regular;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-family:
+    'Inter var', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    'Segoe UI Symbol', 'Noto Color Emoji';
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+
+  @apply text-sm;
+
+  ::-webkit-scrollbar {
+    @apply h-1 w-1 bg-slate-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-300 hover:bg-slate-400;
+  }
+
+  &.dark {
+    ::-webkit-scrollbar {
+      @apply bg-slate-900;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      @apply border-slate-900 bg-slate-700 hover:bg-slate-600;
+    }
+  }
+}

@@ -2,7 +2,7 @@ import { randomBytes } from 'crypto';
 import jwt from 'jsonwebtoken';
 import ms, { StringValue } from 'ms';
 
-import type { JwtPayload } from '../types';
+import type { JwtPayload } from '~/types';
 
 const JWT_SECRET = process.env.JWT_SECRET ?? '';
 const ACCESS_EXPIRES_IN = (process.env.ACCESS_TOKEN_EXPIRY ?? '15m') as StringValue;

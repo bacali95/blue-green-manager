@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:13
+    image: postgres:17
     restart: always
     environment:
       POSTGRES_DB: blue-green-manager
@@ -19,6 +19,18 @@ services:
     ports:
       - '8080:8080'
 
+  redis:
+    image: bitnami/redis
+    restart: always
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+    volumes:
+      - redis-data:/bitnami/redis/data
+    ports:
+      - '6379:6379'
+
 volumes:
   db-data:
+    driver: local
+  redis-data:
     driver: local

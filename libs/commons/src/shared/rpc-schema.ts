@@ -1,5 +1,4 @@
-import type { CommandStatus, Prisma, RegistrationToken } from '@prisma/client';
-import type { InputJsonValue, JsonValue } from '@prisma/client/runtime/library';
+import type { AgentRegistrationToken, CommandStatus } from '@prisma/client';
 
 export type IRpcSchema = {
   [entity: string]: {
@@ -18,47 +17,64 @@ export type RpcClient<T extends IRpcSchema> = {
 
 export type RpcSchema = {
   agent: {
-    register: (params: {
-      ip: string;
-      registrationToken: string;
-      hostname: string;
-      publicKey: string;
-    }) => Promise<{
-      agentId: string;
-      accessToken: string;
-      refreshToken: string;
-      expiresIn: string;
-    }>;
-    refresh: (params: { refreshToken: string }) => Promise<{
-      accessToken: string;
-      refreshToken: string;
-      expiresIn: string;
-    }>;
-    poll: (
-      params: { agentId: string },
-      request: Request,
-    ) => Promise<{
-      commandId: string;
-      command: string;
-      applicationId: string;
-      deploymentId: string | null;
-      metadata: JsonValue;
-    }>;
+    register: (params: AgentRegisterParams) => Promise<AgentRegisterResult>;
+    refresh: (params: AgentRefreshParams) => Promise<AgentRefreshResult>;
+    poll: (params: AgentPollParams) => Promise<AgentPollResult | null>;
   };
   command: {
-    submitResult: (
-      params: {
-        commandId: string;
-        status: CommandStatus;
-        stdoutEnc: string;
-        stderrEnc: string;
-        durationMs: number;
-        metadata: Prisma.NullableJsonNullValueInput | InputJsonValue;
-      },
-      request: Request,
-    ) => Promise<void>;
+    submitResult: (params: CommandSubmitResultParams, request: Request) => Promise<void>;
   };
-  registrationToken: {
-    create: (params: { hostname: string; validForMinutes: number }) => Promise<RegistrationToken>;
+  agentRegistrationToken: {
+    create: (
+      params: AgentRegistrationTokenCreateParams,
+    ) => Promise<AgentRegistrationTokenCreateResult>;
   };
 };
+
+export type AgentRegisterParams = {
+  ip: string;
+  hostname: string;
+  publicKey: string;
+  registrationToken: string;
+};
+export type AgentRegisterResult = {
+  agentId: string;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: string;
+  masterPublicKey: string;
+};
+
+export type AgentRefreshParams = {
+  refreshToken: string;
+};
+export type AgentRefreshResult = {
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: string;
+};
+
+export type AgentPollParams = {
+  agentId: string;
+};
+export type AgentPollResult = {
+  commandLogId: string;
+  applicationName: string;
+  deploymentId: string;
+  dockerCompose: string;
+  extraFiles: { name: string; content: string }[];
+};
+
+export type CommandSubmitResultParams = {
+  commandId: string;
+  status: CommandStatus;
+  stdoutEnc: string;
+  stderrEnc: string;
+  duration: number;
+};
+
+export type AgentRegistrationTokenCreateParams = {
+  agentId: string;
+  validForMinutes: number;
+};
+export type AgentRegistrationTokenCreateResult = AgentRegistrationToken;

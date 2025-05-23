@@ -1,10 +1,10 @@
 import { prisma } from './services';
 
 function cleanupExpiredRegistrationTokens() {
-  prisma.registrationToken.deleteMany({
+  prisma.agentRegistrationToken.deleteMany({
     where: {
       used: false,
-      validUntil: { lt: new Date() },
+      expiresAt: { lt: new Date() },
     },
   });
 }

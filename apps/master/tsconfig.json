@@ -10,7 +10,9 @@
     "rootDirs": [".", "./.react-router/types"],
     "baseUrl": ".",
     "paths": {
+      "~/*": ["./app/*"],
       "@commons/shared": ["../../libs/commons/src/shared/index.ts"],
+      "@commons/client": ["../../libs/commons/src/client/index.ts"],
       "@commons/server": ["../../libs/commons/src/server/index.ts"]
     }
   },
